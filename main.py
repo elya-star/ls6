@@ -8,8 +8,8 @@ def main(page: ft.Page):
 
     task_list = ft.Column(spacing=25)
 
-    def view_tasks(task_id, task_text):
-        task_field = ft.TextField(read_only=True, value=task_text, expand=True)
+    def view_tasks(task_id, task_text, task_d):
+        task_field = ft.TextField(read_only=True, value=task_text, expand=True, label=f"Создано: {task_d}")
 
         def enable_edit(_):
             if task_field.read_only == True:
@@ -25,9 +25,8 @@ def main(page: ft.Page):
 
         save_button = ft.IconButton(icon=ft.Icons.SAVE, on_click=save_task)
 
-        def delete_task(e):
-            tid = task_id[0] if isinstance(task_id, tuple) else task_id
-            main_db.delete_task(tid)
+        def delete_task(_):
+            main_db.delete_task(task_id)
             task_list.controls.remove(row)
             page.update()
 
@@ -39,10 +38,10 @@ def main(page: ft.Page):
     def add_task_db(_):
         if task_input.value:
             task_text = task_input.value
-            new_task_id = main_db.add_task(task=task_text)
+            new_task_id, date_now = main_db.add_task(task=task_text)
             print(f"Задача {task_text} успешно добавлена! Его ID - {new_task_id}")
 
-            task_list.controls.append(view_tasks(task_id=new_task_id, task_text=task_text))
+            task_list.controls.append(view_tasks(task_id=new_task_id, task_text=task_text, task_d=date_now))
 
             task_input.value = ""
 
